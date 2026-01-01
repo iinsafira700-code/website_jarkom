@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<title>QuickVote - Pemilihan Ketua OSIS</title>
+<style>
+* {
+  box-sizing: border-box;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #0f5a36, #1b7d4f);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #fff;
+}
+
+.card {
+  background: #155c36;
+  width: 360px;
+  padding: 25px;
+  border-radius: 18px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+}
+
+h1 {
+  text-align: center;
+  margin-bottom: 5px;
+}
+
+.subtitle {
+  text-align: center;
+  margin-bottom: 20px;
+  opacity: 0.9;
+}
+
+input {
+  width: 100%;
+  padding: 14px;
+  border-radius: 12px;
+  border: none;
+  outline: none;
+  margin-bottom: 15px;
+  font-size: 16px;
+}
+
+button {
+  width: 100%;
+  padding: 14px;
+  border: none;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.btn-green {
+  background: #22c55e;
+  color: #fff;
+}
+
+.btn-outline {
+  background: transparent;
+  border: 2px solid #22c55e;
+  color: #22c55e;
+}
+
+.btn-red {
+  background: #ef4444;
+  color: #fff;
+}
+
+.note {
+  text-align: center;
+  font-size: 13px;
+  margin-top: 10px;
+  opacity: 0.8;
+}
+
+.list {
+  margin-top: 15px;
+}
+
+.item {
+  background: #1d6b41;
+  padding: 12px 15px;
+  border-radius: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+  cursor: pointer;
+}
+
+.item:hover {
+  background: #228653;
+}
+
+.hidden {
+  display: none;
+}
+
+.actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 15px;
+}
+.actions button {
+    position: relative;
+    z-index: 9999;
+    pointer-events: auto;
+}
+.btn-outline {
+    background-color: #1d6b41;
+    color: #ffffff;
+    border: 2px solid #22c55e;
+}
+body {
+    pointer-events: none;
+}
+.card, .card *{
+    pointer-events: auto;
+}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div class="card" id="loginPage">
+  <h1>📋 QuickVote</h1>
+  <div class="subtitle">Pemilihan Ketua OSIS</div>
+
+  <input type="text" id="nama" placeholder="Masukkan nama kamu">
+  <button class="btn-green" onclick="masukVoting()">Masuk Voting</button>
+
+  <div class="note">
+    Buka di beberapa tab untuk simulasi banyak pemilih
+  </div>
+</div>
+
+<!-- VOTING -->
+<div class="card hidden" id="votingPage">
+  <h1>Pilih Calon Ketua OSIS</h1>
+
+  <div class="list">
+    <div class="item" onclick="pilih('Andi Pratama')">
+      <span>Andi Pratama</span>
+      <span id="andi">0 suara</span>
+    </div>
+    <div class="item" onclick="pilih('Siti Aisyah')">
+      <span>Siti Aisyah</span>
+      <span id="siti">0 suara</span>
+    </div>
+    <div class="item" onclick="pilih('Budi Santoso')">
+      <span>Budi Santoso</span>
+      <span id="budi">0 suara</span>
+    </div>
+    <div class="item" onclick="pilih('Rina Kartika')">
+      <span>Rina Kartika</span>
+      <span id="rina">0 suara</span>
+    </div>
+  </div>
+
+  <button class="btn-outline" onclick="lihatHasil()">Lihat Hasil Voting</button>
+</div>
+
+<!-- HASIL -->
+<div class="card hidden" id="hasilPage">
+  <h1>Hasil Sementara</h1>
+
+  <div class="list">
+    <div class="item"><span>Andi Pratama</span><span id="h_andi">0 suara</span></div>
+    <div class="item"><span>Siti Aisyah</span><span id="h_siti">0 suara</span></div>
+    <div class="item"><span>Budi Santoso</span><span id="h_budi">0 suara</span></div>
+    <div class="item"><span>Rina Kartika</span><span id="h_rina">0 suara</span></div>
+  </div>
+
+  <div class="actions">
+  <button class="btn-green" onclick="kembali()">Kembali</button>
+  <button class="btn-login" onclick="keLogin()">Login Ulang</button>
+  <button class="btn-red" onclick="reset()">Reset</button>
+</div>
+
+</div>
+
+<script>
+let suara = JSON.parse(localStorage.getItem("suara")) || {
+  andi: 0,
+  siti: 0,
+  budi: 0,
+  rina: 0
+};
+
+function masukVoting() {
+  const nama = document.getElementById("nama").value;
+  if (!nama) {
+    alert("Nama wajib diisi");
+    return;
+  }
+  document.getElementById("loginPage").classList.add("hidden");
+  document.getElementById("votingPage").classList.remove("hidden");
+  update();
+}
+
+function pilih(nama) {
+  if (nama === "Andi Pratama") suara.andi++;
+  if (nama === "Siti Aisyah") suara.siti++;
+  if (nama === "Budi Santoso") suara.budi++;
+  if (nama === "Rina Kartika") suara.rina++;
+
+  localStorage.setItem("suara", JSON.stringify(suara));
+  update();
+  lihatHasil();
+}
+
+function update() {
+  andi.innerText = suara.andi + " suara";
+  siti.innerText = suara.siti + " suara";
+  budi.innerText = suara.budi + " suara";
+  rina.innerText = suara.rina + " suara";
+
+  h_andi.innerText = suara.andi + " suara";
+  h_siti.innerText = suara.siti + " suara";
+  h_budi.innerText = suara.budi + " suara";
+  h_rina.innerText = suara.rina + " suara";
+}
+
+function lihatHasil() {
+  votingPage.classList.add("hidden");
+  hasilPage.classList.remove("hidden");
+}
+
+function kembali() {
+  hasilPage.classList.add("hidden");
+  votingPage.classList.remove("hidden");
+}
+
+function reset() {
+  if (!confirm("Reset semua suara?")) return;
+  suara = { andi: 0, siti: 0, budi: 0, rina: 0 };
+  localStorage.removeItem("suara");
+  update();
+}
+function keLogin() {
+  document.getElementById("hasilPage").classList.add("hidden");
+  document.getElementById("votingPage").classList.add("hidden");
+  document.getElementById("loginPage").classList.remove("hidden");
+  document.getElementById("nama").value = "";
+}
+</script>
+
+</body>
+</html>
